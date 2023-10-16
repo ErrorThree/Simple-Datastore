@@ -5,6 +5,7 @@ This module provides functions for creating, reading, and editing JSON files in 
 import os
 import json
 
+
 def create(folder, jsonfile, template):
     """
     Create a JSON file with the given content in the specified folder.
