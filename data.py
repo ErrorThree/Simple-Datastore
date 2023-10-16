@@ -1,38 +1,33 @@
 import os
 import json
 
-
 def create(folder, jsonfile, template):
     jsonfile = str(jsonfile)
     template = dict(template)
 
-    if os.path.isfile(f"{folder}/{jsonfile}") or os.path.isfile(jsonfile):
+    file_path = os.path.join(folder, jsonfile)
+    
+    if os.path.exists(file_path):
         print("File already exists.")
         return
-    elif folder is None:
-        f = open(jsonfile, "x")
-        f.write(json.dumps(template))
-        f.close()
-        print("File created.")
-        return
-    elif os.path.isdir(folder):
-        f = open(os.path.join(folder, jsonfile), "x")
-        f.write(json.dumps(template))
-        f.close()
-        print("File within folder created.")
-        return
-    else:
-        os.makedirs(folder)
-        f = open(os.path.join(folder, jsonfile), "x")
-        f.write(json.dumps(template))
-        f.close()
-        print("Folder and file created.")
-        return
 
+    if folder is not None:
+        os.makedirs(folder, exist_ok=True)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(template, f)
+        print("File created.")
+        
 
 def read(folder, jsonfile):
     jsonfile = str(jsonfile)
-    with open(os.path.join(folder, jsonfile), "r") as f:
+    file_path = os.path.join(folder, jsonfile)
+    
+    if not os.path.exists(file_path):
+        print("File does not exist.")
+        return None
+
+    with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
     return data
 
@@ -40,11 +35,16 @@ def read(folder, jsonfile):
 def edit(folder, jsonfile, update):
     update = dict(update)
     file_path = os.path.join(folder, jsonfile)
-    with open(file_path, "rt") as f:
+
+    if not os.path.exists(file_path):
+        print("File does not exist.")
+        return
+
+    with open(file_path, "r", encoding="utf-8") as f:
         unloadf = json.load(f)
         unloadf.update(update)
-    os.remove(file_path)
-    with open(file_path, "x") as f:
-        f.write(json.dumps(unloadf))
-    print("File edited.")
-    return
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(unloadf, f)
+        print("File edited.")
+        
